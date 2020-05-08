@@ -52,19 +52,11 @@ class DropDown {
         });
 
           this.optionsList.forEach(o => {
-        //   o.addEventListener("click", () => {
-        //     let selectedData = this.data.find((value)=>{
-        //         return(value[this.filterName] === o.querySelector("label").innerHTML);
-        //     });
-        //     createChart(selectedData);
-        //     this.selected.innerHTML = o.querySelector("label").innerHTML;
-        //     this.optionsContainer.classList.remove("active");
-        //   });
         o.addEventListener("click", () => {
             let selectedData = this.data.find((value)=>{
                 return(value[this.filterName] === o.querySelector("label").innerHTML);
             });
-            throttle(createChart(selectedData), 12000); ///USe throttling while calling data
+            throttle(createChart(selectedData), 3000); ///USe throttling while calling data
             this.selected.innerHTML = o.querySelector("label").innerHTML;
             this.optionsContainer.classList.remove("active");
           });
