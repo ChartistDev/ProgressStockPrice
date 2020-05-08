@@ -75,6 +75,7 @@ svg.selectAll(".dot")
     .attr("cx", function(d, i) { return xScale(i) })
     .attr("cy", function(d) { return yScale(+d["4. close"]) })
     .attr("r", 2)
+    .style("cursor", "pointer")
       .on("mouseover", function(a) {
           text.text("Close: "+a["4. close"]).style("fill", a["4. close"]>=a["1. open"]? "green": "red");
           let circle = d3.select(this)
