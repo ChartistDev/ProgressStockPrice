@@ -4,38 +4,39 @@ import *  as d3 from "d3";
 import {state} from "../manager";
 import clearPage from "../helper/clearPage";
 const drawChart = (JSONdata) => {
-    let svg = document.querySelector("#chartCanvas");
-    clearPage(svg);
+    let svg = d3.select(document.querySelector("#chartCanvas"));
+    clearPage(document.querySelector("#chartCanvas"));
+    var margin = {top: 50, right: 50, bottom: 50, left: 50};
+    var rect = svg.node().getBoundingClientRect(),
+    width = rect.width - margin.left - margin.right,
+    height = rect.height - margin.top - margin.bottom;
+    svg = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var text  = svg.append("text");
+    if(JSONdata!==null && Object.keys(JSONdata).length > 0) { 
     var data = Object.values(JSONdata);
     var dates = Object.keys(JSONdata);
+
+    // Get minLow and maxhigh of stock data
     function getMinY() {
         return data.reduce((min, p) => +p["3. low"] < min ? +p["3. low"] : min, +data[0]["3. low"]);
       }
       function getMaxY() {
         return data.reduce((max, p) => +p["2. high"] > max ? +p["2. high"] : max, +data[0]["2. high"]);
       }
-    var margin = {top: 50, right: 50, bottom: 50, left: 50};
-    svg = d3.select(svg)
-    var rect = svg.node().getBoundingClientRect(),
-    width = rect.width - margin.left - margin.right,
-    height = rect.height - margin.top - margin.bottom;
-    svg = svg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-// 5. X scale will use the index of our data
+//  X scale will use the index of our data
 var xScale = d3.scaleLinear()
     .domain([0, data.length-1]) // input
-    .range([width, 0]); // output
+    .range([width, 3]); // output
 
-// 6. Y scale will use the randomly generate number 
+//  Y scale will use the randomly generate number 
 var yScale = d3.scaleLinear()
     .domain([getMinY(), getMaxY()]) // input 
     .range([height, 0]); // output 
-    console.log(yScale.domain());
-    console.log(yScale.range())
 
-// 7. d3's line generator
+//  d3's line generator
 var line = d3.line()
     .x(function(d, i) { return xScale(i); }) // set the x values for the line generator
     .y(function(d) { 
@@ -43,31 +44,30 @@ var line = d3.line()
         return yScale(+d["4. close"]); 
     }) // set the y values for the line generator 
 
-var text  = svg.append("text");
 
 var xAxis = d3.axisBottom(xScale);
     xAxis.tickFormat(function(d) {
         return(dates[+d])
     })
 
-// 3. Call the x axis in a group tag
+//  Call the x axis in a group tag
 svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis); // Create an axis component with d3.axisBottom
 
-// 4. Call the y axis in a group tag
+//  Call the y axis in a group tag
 svg.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-// 9. Append the path, bind the data, and call the line generator 
+//  Append the path, bind the data, and call the line generator 
 svg.append("path")
     .datum(data) // 10. Binds data to the line 
     .attr("class", "line") // Assign a class for styling 
     .attr("d", line); // 11. Calls the line generator 
 
-// 12. Appends a circle for each datapoint 
+//  Appends a circle for each datapoint 
 svg.selectAll(".dot")
     .data(data)
   .enter().append("circle") // Uses the enter().append() method
@@ -76,22 +76,31 @@ svg.selectAll(".dot")
     .attr("cy", function(d) { return yScale(+d["4. close"]) })
     .attr("r", 2)
       .on("mouseover", function(a) {
-          text.text(a["4. close"]);
+          text.text("Close: "+a["4. close"]).style("fill", a["4. close"]>=a["1. open"]? "green": "red");
           let circle = d3.select(this)
-          text.attr("transform", "translate(" + circle.attr("cx") + "," + circle.attr("cy") + ")");
+              circle.attr("r", 5);
+          text.attr("transform", "translate(" + (width - 100) + ",0)");
 		})
-      .on("mouseout", function() {  })
+      .on("mouseout", function() {  
+        text.text("");
+        let circle = d3.select(this)
+            circle.attr("r", 2);
+        text.attr("transform", "translate(0,0)");
+      })
+    } else {
+        text.text("No Data To Display");
+        text.attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+    }
 
 }
 const createChart = async function(data) {
-    console.log(data);
     try {
     let fetchAPI = await fetch("https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol="+data.symbol+"&interval=5min&apikey="+apiKey);
     let fetchJSON = await fetchAPI.json();
         state.setData(fetchJSON["Time Series (Daily)"]);
         drawChart(fetchJSON["Time Series (Daily)"]);
     } catch (e) {
-        console.log(e);
+        drawChart(null)
     }
 }
 

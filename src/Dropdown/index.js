@@ -1,5 +1,6 @@
 import setAttributes from "../helper/attributeSetter";
 import {createChart} from "../Chart"; 
+import throttle from "../helper/throttle";
 
 class DropDown {
   constructor() {
@@ -51,11 +52,19 @@ class DropDown {
         });
 
           this.optionsList.forEach(o => {
-          o.addEventListener("click", () => {
+        //   o.addEventListener("click", () => {
+        //     let selectedData = this.data.find((value)=>{
+        //         return(value[this.filterName] === o.querySelector("label").innerHTML);
+        //     });
+        //     createChart(selectedData);
+        //     this.selected.innerHTML = o.querySelector("label").innerHTML;
+        //     this.optionsContainer.classList.remove("active");
+        //   });
+        o.addEventListener("click", () => {
             let selectedData = this.data.find((value)=>{
                 return(value[this.filterName] === o.querySelector("label").innerHTML);
             });
-            createChart(selectedData);
+            throttle(createChart(selectedData), 12000); ///USe throttling while calling data
             this.selected.innerHTML = o.querySelector("label").innerHTML;
             this.optionsContainer.classList.remove("active");
           });

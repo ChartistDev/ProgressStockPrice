@@ -2,18 +2,6 @@ html,body {
     height: 90%;
     min-height: 90%;
 }
-/* .card {
-    height: 300px;
-    width: 300px;
-    margin: 10px;
-    box-shadow: 0px 4px 8px 0px #181717;
-    transition: 0.3s;
-    background: aliceblue;
-    cursor: pointer;
-}
-.card:hover {
-    box-shadow: 0px 8px 20px 0px #3f3e3e;
-} */
 #companyBody {
     display: flex;
     align-items: center;
@@ -155,7 +143,7 @@ html,body {
     margin: 10px;
 }
 #dateSubmit {
-    width: 25%;
+    width: 200px;
     border-radius: 10px;
     font-size: 16px;
     font-family: "Roboto", sans-serif;
